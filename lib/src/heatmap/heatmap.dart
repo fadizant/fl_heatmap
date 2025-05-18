@@ -14,7 +14,8 @@ class Heatmap extends StatefulWidget {
       this.rowsVisible,
       this.showAll,
       this.showAllButtonText = 'Show all',
-      this.onItemSelectedListener})
+      this.onItemSelectedListener,
+      this.boxHeightMultiplier = 1.0})
       : super(key: key);
 
   /// The data of the heatmap including color palette
@@ -37,6 +38,9 @@ class Heatmap extends StatefulWidget {
   /// shows the label "Show all". You can override this String to show you own label (e.g. with translation or
   /// different wording).
   final String showAllButtonText;
+
+  /// Height multiplier for the heatmap boxes.
+  final double boxHeightMultiplier;
 
   /// [selectedItem] is null if item is unselected
   final Function(HeatmapItem? selectedItem)? onItemSelectedListener;
@@ -127,8 +131,10 @@ class _HeatmapState extends State<Heatmap> {
               spaceForRectWithMargins * (1.0 - _borderThicknessInPercent);
           final double margin =
               spaceForRectWithMargins * _borderThicknessInPercent;
-          if (boxHeightWithMargin != sizeOfRect + margin) {
-            boxHeightWithMargin = sizeOfRect + margin;
+          if (boxHeightWithMargin !=
+              sizeOfRect * widget.boxHeightMultiplier + margin) {
+            boxHeightWithMargin =
+                sizeOfRect * widget.boxHeightMultiplier + margin;
             Future.delayed(const Duration(milliseconds: 0), () {
               setState(() {});
             });
@@ -148,8 +154,12 @@ class _HeatmapState extends State<Heatmap> {
           final List<Rect> rects = [
             for (int row = 0; row < rows; row++)
               for (int col = 0; col < columns; col++)
-                Rect.fromLTWH(sizeOfRect * col + margin * col,
-                    sizeOfRect * row + margin * row, sizeOfRect, sizeOfRect),
+                Rect.fromLTWH(
+                    sizeOfRect * col + margin * col,
+                    sizeOfRect * widget.boxHeightMultiplier * row +
+                        margin * row,
+                    sizeOfRect,
+                    sizeOfRect * widget.boxHeightMultiplier),
           ];
           final List<ViewModelItem> vmItems = [
             for (int row = 0; row < rows; row++)
@@ -166,9 +176,10 @@ class _HeatmapState extends State<Heatmap> {
                       max: max,
                       rect: Rect.fromLTWH(
                           sizeOfRect * col + margin * col,
-                          sizeOfRect * row + margin * row,
+                          sizeOfRect * widget.boxHeightMultiplier * row +
+                              margin * row,
                           sizeOfRect,
-                          sizeOfRect))
+                          sizeOfRect * widget.boxHeightMultiplier))
                 else
                   ViewModelItem(
                       item: null,
@@ -177,11 +188,13 @@ class _HeatmapState extends State<Heatmap> {
                       max: max,
                       rect: Rect.fromLTWH(
                           sizeOfRect * col + margin * col,
-                          sizeOfRect * row + margin * row,
+                          sizeOfRect * widget.boxHeightMultiplier * row +
+                              margin * row,
                           sizeOfRect,
-                          sizeOfRect)),
+                          sizeOfRect * widget.boxHeightMultiplier)),
           ];
-          final usedHeight = (sizeOfRect + margin) * rows;
+          final usedHeight =
+              (sizeOfRect * widget.boxHeightMultiplier + margin) * rows;
 
           final listener = Listener(
             onPointerDown: (PointerDownEvent event) {
