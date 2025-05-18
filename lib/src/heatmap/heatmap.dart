@@ -229,6 +229,7 @@ class _HeatmapState extends State<Heatmap> {
                   constraints: const BoxConstraints.expand(),
                 )),
           );
+          double labelHeightWithMargin = sizeOfRect + margin;
           return Column(
             children: [
               SizedBox(
@@ -253,13 +254,15 @@ class _HeatmapState extends State<Heatmap> {
                 Row(
                   children: [
                     for (int i = 0; i < columns; i++)
-                      RowLabel(widget.heatmapData.columns[i],
-                          withoutMargin: i == columns - 1,
-                          width: boxHeightWithMargin -
-                              (i == columns - 1
-                                  ? boxHeightWithMargin *
-                                      _borderThicknessInPercent // size of one margin
-                                  : 0)),
+                      RowLabel(
+                        widget.heatmapData.columns[i],
+                        withoutMargin: i == columns - 1,
+                        width: (labelHeightWithMargin -
+                            (i == columns - 1
+                                ? labelHeightWithMargin *
+                                    _borderThicknessInPercent // size of one margin
+                                : 0)),
+                      ),
                   ],
                 )
             ],
